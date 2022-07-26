@@ -15,11 +15,11 @@ import { IFreeSwapInfo } from '../pages/Swap'
 
 enum SwapType {
   EXACT_TOKENS_FOR_TOKENS,
-  EXACT_TOKENS_FOR_ETH,
-  EXACT_ETH_FOR_TOKENS,
+  EXACT_TOKENS_FOR_VET,
+  EXACT_VET_FOR_TOKENS,
   TOKENS_FOR_EXACT_TOKENS,
-  TOKENS_FOR_EXACT_ETH,
-  ETH_FOR_EXACT_TOKENS,
+  TOKENS_FOR_EXACT_VET,
+  VET_FOR_EXACT_TOKENS,
   WRAP_VET,
   UNWRAP_WVET
 }
@@ -30,13 +30,13 @@ function getSwapType(tokens: { [field in Field]?: Token }, isExactIn: boolean, c
       if (tokens[Field.OUTPUT]?.equals(WVET[chainId])) {
         return SwapType.WRAP_VET
       } else {
-        return SwapType.EXACT_ETH_FOR_TOKENS
+        return SwapType.EXACT_VET_FOR_TOKENS
       }
     } else if (tokens[Field.OUTPUT]?.equals(DUMMY_VET[chainId])) {
       if (tokens[Field.INPUT]?.equals(WVET[chainId])) {
         return SwapType.UNWRAP_WVET
       } else {
-        return SwapType.EXACT_TOKENS_FOR_ETH
+        return SwapType.EXACT_TOKENS_FOR_VET
       }
     } else {
       return SwapType.EXACT_TOKENS_FOR_TOKENS
@@ -46,13 +46,13 @@ function getSwapType(tokens: { [field in Field]?: Token }, isExactIn: boolean, c
       if (tokens[Field.OUTPUT]?.equals(WVET[chainId])) {
         return SwapType.WRAP_VET
       } else {
-        return SwapType.ETH_FOR_EXACT_TOKENS
+        return SwapType.VET_FOR_EXACT_TOKENS
       }
     } else if (tokens[Field.OUTPUT]?.equals(DUMMY_VET[chainId])) {
       if (tokens[Field.INPUT]?.equals(WVET[chainId])) {
         return SwapType.UNWRAP_WVET
       } else {
-        return SwapType.TOKENS_FOR_EXACT_ETH
+        return SwapType.TOKENS_FOR_EXACT_VET
       }
     } else {
       return SwapType.TOKENS_FOR_EXACT_TOKENS
@@ -131,13 +131,13 @@ export function useSwapCallback(
           ]
           value = null
           break
-        case SwapType.EXACT_ETH_FOR_TOKENS:
+        case SwapType.EXACT_VET_FOR_TOKENS:
           abi = find(IVexchangeV2Router02ABI, { name: 'swapExactVETForTokens' })
 
           args = [slippageAdjustedAmounts[Field.OUTPUT].raw.toString(), path, recipient, deadlineFromNow]
           value = BigNumber.from(slippageAdjustedAmounts[Field.INPUT].raw.toString())
           break
-        case SwapType.TOKENS_FOR_EXACT_ETH:
+        case SwapType.TOKENS_FOR_EXACT_VET:
           abi = find(IVexchangeV2Router02ABI, { name: 'swapTokensForExactVET' })
 
           args = [
@@ -149,7 +149,7 @@ export function useSwapCallback(
           ]
           value = null
           break
-        case SwapType.EXACT_TOKENS_FOR_ETH:
+        case SwapType.EXACT_TOKENS_FOR_VET:
           abi = find(IVexchangeV2Router02ABI, { name: 'swapExactTokensForVET' })
 
           args = [
@@ -161,7 +161,7 @@ export function useSwapCallback(
           ]
           value = null
           break
-        case SwapType.ETH_FOR_EXACT_TOKENS:
+        case SwapType.VET_FOR_EXACT_TOKENS:
           abi = find(IVexchangeV2Router02ABI, { name: 'swapVETForExactTokens' })
 
           args = [slippageAdjustedAmounts[Field.OUTPUT].raw.toString(), path, recipient, deadlineFromNow]

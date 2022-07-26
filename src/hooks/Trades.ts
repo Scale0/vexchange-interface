@@ -13,27 +13,27 @@ function useAllCommonPairs(tokenA?: Token, tokenB?: Token): Pair[] {
   const pairBetween = usePair(tokenA, tokenB)
 
   // get token<->WVET pairs
-  const aToETH = usePair(tokenA, WVET[chainId])
-  const bToETH = usePair(tokenB, WVET[chainId])
+  const aToWVET = usePair(tokenA, WVET[chainId])
+  const bToWVET = usePair(tokenB, WVET[chainId])
 
   // get token<->VTHO pairs
   const aToVTHO = usePair(tokenA, chainId === ChainId.MAINNET ? VTHO : undefined)
   const bToVTHO = usePair(tokenB, chainId === ChainId.MAINNET ? VTHO : undefined)
 
   // get connecting pairs
-  const VTHOToETH = usePair(chainId === ChainId.MAINNET ? VTHO : undefined, WVET[chainId])
+  const VTHOToWVET = usePair(chainId === ChainId.MAINNET ? VTHO : undefined, WVET[chainId])
 
   // only pass along valid pairs, non-duplicated pairs
   return useMemo(
     () =>
-      [pairBetween, aToETH, bToETH, aToVTHO, bToVTHO, VTHOToETH]
+      [pairBetween, aToWVET, bToWVET, aToVTHO, bToVTHO, VTHOToWVET]
         // filter out invalid pairs
         .filter(p => !!p)
         // filter out duplicated pairs
         .filter(
           (p, i, pairs) => i === pairs.findIndex(pair => pair?.liquidityToken.address === p.liquidityToken.address)
         ),
-    [pairBetween, aToETH, bToETH, aToVTHO, bToVTHO, VTHOToETH]
+    [pairBetween, aToWVET, bToWVET, aToVTHO, bToVTHO, VTHOToWVET]
   )
 }
 
@@ -86,11 +86,13 @@ export function useTradeExactIn(amountIn?: TokenAmount, tokenOut?: Token): Trade
         trade.outputAmount = amountOut
         return trade
       } else {
+        const trade = Trade.bestTradeExactIn(allowedPairs, amountIn, tokenOut, {
+          maxHops: 2,
+          maxNumResults: 1
+        })
+
         return (
-          Trade.bestTradeExactIn(allowedPairs, amountIn, tokenOut, {
-            maxHops: 1,
-            maxNumResults: 1
-          })[0] ?? null
+          trade[0] ?? null
         )
       }
     }
